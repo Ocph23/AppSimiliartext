@@ -1,0 +1,6 @@
+{
+  "name": "myproject",
+  "dependencies": {
+    "ngprogress": "~1.1.3"
+  }
+}

@@ -1,0 +1,52 @@
+﻿@model AdrianaApp.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Login.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+
+        <h2>@ViewBag.Title.</h2>
+
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+            @Html.AntiForgeryToken()
+            <h4>Buat Akun Baru</h4>
+            <hr />
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+            <div class="form-group">
+                <label class="col-md-4 control-label">Email</label>
+                <div class="col-md-8">
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Password</label>
+                <div class="col-md-8">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Ulangi Password</label>
+                <div class="col-md-8">
+                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-4 col-md-8">
+                    <input type="submit" class="btn btn-default" value="Register" />
+                </div>
+            </div>
+    }
+
+        @section Scripts {
+            @Scripts.Render("~/bundles/jqueryval")
+        }
+
+
+    </div>
+
+    <div class="col-md-2"></div>
+</div>

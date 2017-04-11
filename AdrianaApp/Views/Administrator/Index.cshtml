@@ -1,0 +1,333 @@
+﻿
+
+@{
+    ViewBag.Title = "Administrator";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+}
+
+<h2>Administrator</h2>
+
+
+<div class="row">
+
+    <div ng-view></div>
+
+    <script type="text/ng-template" id="IndexView.htm">
+        <div class="jumbotron">
+            <h2>
+                Selamat Datang 
+            </h2>
+          
+
+
+        </div>
+    </script>
+
+
+    <script type="text/ng-template" id="JudulView.htm">
+        <div ng-init="Init()">
+            <center>
+                <h2>
+                    {{Judul}}
+                </h2>
+            </center>
+            <button type="button" data-toggle="modal" data-target="#addjudul" class="btn btn-success">
+                Tambah Judul
+            </button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Judul
+                        </th>
+                        <th>
+                            Nama Penulis
+                        </th>
+                        <th>
+                            Pembimbing I
+                        </th>
+                        <th>
+                            Pembimbing II
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="item in Abstracts|filter:SearchModel">
+                        <td>
+                            {{item.Judul}}
+                        </td>
+                        <td>{{item.Nama}}</td>
+                        <td>{{item.Pembimbing1}}</td>
+                        <td>{{item.Pembimbing2}}</td>
+                        <td>
+                            <div class="btn-group pull-right" role="group" aria-label="...">
+                                <button type="button" data-toggle="modal" data-target="#MahasiswaDetail" ng-click="SelectedAbstract(item)" class="btn btn-success"><i class="glyphicon glyphicon-eye-open"></i></button>
+                                <button type="button" data-toggle="modal" data-target="#editjudul" ng-click="SelectedAbstract(item)" class="btn btn-warning"><i class="glyphicon glyphicon-edit"></i></button>
+                                <button type="button" ng-click="RemoveAbstract(item)" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></button>
+                                <button type="button"  data-toggle="modal" data-target="#viewModal" ng-click="ViewAbstract(item)" class="btn btn-info"><i class="glyphicon glyphicon-file"></i></button>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <div class="modal fade" id="MahasiswaDetail" tabindex="-1" role="dialog" aria-labelledby="MahasiswaDetail-label">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="MahasiswaDetail-label">Data Mahasiswa</h4>
+                        </div>
+                            <div class="modal-body">
+                                <table class="table">
+                                    <tr>
+                                        <td>NPM</td>
+                                        <td>{{Selected.NPM}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nama</td>
+                                        <td>{{Selected.Nama}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jurusan</td>
+                                        <td>{{Selected.Jurusan}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Alamat</td>
+                                        <td>{{Selected.Alamat}}</td>
+                                    </tr>
+                                 
+                                </table>
+                              </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="modal fade" id="addjudul" tabindex="-1" role="dialog" aria-labelledby="addjudul-label">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="addjudul-label">Tambah Judul Baru</h4>
+                        </div>
+                        <form ng-submit="AddNewAbstract(model)">
+                            <div class="modal-body">
+
+                                <div class="modal-body">
+                                    <div class="form-group"> <input ng-model="model.NPM" class="form-control" type="text" placeholder="NPM" /> </div>
+                                    <div class="form-group"> <input ng-model="model.Nama" class="form-control" type="text" placeholder="NAMA" /> </div>
+                                    <div class="form-group"> <input ng-model="model.Jurusan" class="form-control" type="text" placeholder="Jurusan" /> </div>
+                                    <div class="form-group"> <textarea ng-model="model.Alamat" class="form-control" type="text" placeholder="Alamat"></textarea> </div>
+
+                                    <div class="form-group"> <textarea ng-model="model.Judul" class="form-control" type="text" placeholder="Judul" required></textarea> </div>
+                                   
+                                    <div class="form-group"> <input class="form-control" type="file" id="file" name="file" placeholder="Abstrak" 
+                                                                    accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                                                                    required /> </div>
+                                    <div class="form-group"> <input ng-model="model.Pembimbing1" class="form-control" type="text" placeholder="Pembimbing I" required /> </div>
+                                    <div class="form-group"> <input ng-model="model.Pembimbing2" class="form-control" type="text" placeholder="Pembimbing II" required /> </div>
+                                   
+                                </div>
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                                <button type="submit"  class="btn btn-primary">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="editjudul" tabindex="-1" role="dialog" aria-labelledby="editjudul-label">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="editjudul-label">Edit Judul</h4>
+                        </div>
+
+                        <form>
+                            <div class="modal-body">
+
+                                <div class="modal-body">
+                                    <div class="form-group"> <input ng-model="Selected.Judul" class="form-control" type="text" placeholder="Judul" data-toggle="tooltip" title="Judul" required /> </div>
+
+
+                                    <div class="form-group"> <input ng-model="Selected.Pembimbing1" class="form-control" type="text" placeholder="Pembimbing I" data-toggle="tooltip" title="Pembimbing I" required /> </div>
+                                    <div class="form-group"> <input ng-model="Selected.Pembimbing2" class="form-control" type="text" placeholder="Pembimbing II" data-toggle="tooltip" title="pembimbing II" required /> </div>
+
+                                </div>
+
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                                <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="UpdateAbstract(Selected)">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModal-label">
+                <div class="modal-dialog modal-lg" style="width:100%;height:100%;margin:5;padding:5" role="document"> 
+                    <div class="modal-content" style="height:100%">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="viewModal-label">Document</h4>
+                        </div>
+                        <div class="modal-body" style="height:90%;overflow:scroll;padding:5">
+                            <div ng-bind-html="PageHtml"></div>
+                        </div>
+                     
+                    </div>
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="MahasiswaView.htm">
+        <div ng-init="Init()">
+            <center>
+                <h2>
+                    {{Judul}}
+                </h2>
+            </center>
+            <button type="button" data-toggle="modal" data-target="#myModal" class="btn btn-success">
+                Tambah
+            </button>
+          
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            NPM
+                        </th>
+                        <th>
+                            NAMA
+                        </th>
+                        <th>
+                            Jurusan
+                        </th>
+                        <th>
+                            Alamat
+                        </th>
+                        <th>
+                        
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in Mahasiswa|filter:SearchModel">
+                        <td>
+                            {{item.NPM}}
+                        </td>
+                        <td>{{item.Nama}}</td>
+                        <td>{{item.Jurusan}}</td>
+                        <td>{{item.Alamat}}</td>
+                        <td>
+                            <div class="btn-group pull-right" role="group" aria-label="...">
+                                <button data-toggle="modal" data-target="#editModal" ng-click="SelectedMahasiswa(item)" type="button" class="btn btn-warning"><i class="glyphicon glyphicon-edit"></i></button>
+                                <button type="button" ng-click="RemoveMahasiswa(item)" class="btn btn-danger"><i class="glyphicon glyphicon-remove"></i></button>
+                                <button  data-toggle="modal" data-target="#viewModal" type="button"ng-click="ViewMahasiswa(item)" class="btn btn-info"><i class="glyphicon glyphicon-eye-open"></i></button>
+                            </div>
+
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal-label">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModal-label">Tambah Mahasiswa</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group"> <input ng-model="model.NPM" class="form-control" type="text" placeholder="NPM" /> </div>
+                            <div class="form-group"> <input ng-model="model.Nama" class="form-control" type="text" placeholder="NAMA" /> </div>
+                            <div class="form-group"> <input ng-model="model.Jurusan" class="form-control" type="text" placeholder="Jurusan" /> </div>
+                            <div class="form-group"> <textarea ng-model="model.Alamat" class="form-control" type="text" placeholder="Alamat"></textarea> </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                            <button type="button"  class="btn btn-default" data-dissmiss="modal" ng-click="AddNewMahasiswa(model)">
+                                Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+         
+            <div class="modal fade" id="viewModal" tabindex="-1" role="dialog" aria-labelledby="viewModal-label">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="viewModal-label">Data Mahasiswa</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModal-label">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="editModal-label">Edit Mahasiswa</h4>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="form-group"> <input ng-model="Selected.NPM" class="form-control" type="text" placeholder="NPM" data-toggle="tooltip" title="NPM" /> </div>
+                                <div class="form-group"> <input ng-model="Selected.Nama" class="form-control" type="text" placeholder="NAMA" data-toggle="tooltip" title="Nama"  /> </div>
+                                <div class="form-group"> <input ng-model="Selected.Jurusan" class="form-control" type="text" placeholder="Jurusan" data-toggle="tooltip" title="Jurusan"  /> </div>
+                                <div class="form-group"> <textarea ng-model="Selected.Alamat" class="form-control" type="text" placeholder="Alamat" data-toggle="tooltip" title="Alamat" ></textarea> </div>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Keluar</button>
+                                <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="UpdateMahasiswa(Selected)">
+                                    Simpan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </script>
+
+
+
+</div>

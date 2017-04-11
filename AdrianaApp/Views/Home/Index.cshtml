@@ -1,0 +1,158 @@
+﻿    @{
+    ViewBag.Title = "Application Similiar Text";
+}
+
+<style>
+    .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 5;
+        padding: 5;
+    }
+
+    .modal-content {
+        height:100%;
+        border-radius: 0;
+    }
+     .modal-body {
+        height:85%;
+        border-radius: 0;
+        overflow:scroll;
+        padding:5;
+    }
+</style>
+<div class="row">
+
+    <div ng-view></div>
+
+    <script type="text/ng-template" id="UserIndexView.htm">
+        <div class="jumbotron">
+            <center>
+                <h2>
+                  SELAMAT DATANG
+                </h2>
+            </center>
+        </div>
+    </script>
+
+
+    <script type="text/ng-template" id="DeteksiView.htm">
+        <div ng-init="Init()">
+            <center>
+                <h2>
+                    {{Judul}}
+                </h2>
+            </center>
+            <div class="well clearfix">
+                <div class="col-md-6" style="padding:10px">
+                    <form ng-submit="Proccess(model)">
+                        <div class="form-group">
+                            <textarea ng-model="model.Judul" class="form-control" type="text" placeholder="Judul TA" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            File Abstrak
+                            <input class="form-control" type="file" id="file" name="file" placeholder="Lokasi" required accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-warning" type="submit">Proses</button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="col-md-6 well" >
+                    
+                    <div class="form-group">
+                        <h5>Setting</h5>
+                        <div class="form-group">
+                            <div class="col-sm-offset-1 col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" ng-model="model.TandaBaca" >Abaikan Tanda Baca
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-offset-1 col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox"  ng-model="model.Angka" >Abaikan Angka
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-offset-1 col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox"  ng-model="model.HurufBesar">Abaikan Huruf Besar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+              
+            </div>
+
+            <div class="well clearfix">
+                <table class="table row " ng-show="HaveResult">
+                    <thead>
+                        <tr>
+                            <th>Judul TA</th>
+                            <th>File</th>
+                            <th>Kemiripan Judul</th>
+                            <th>Kemiripan Abstrak</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="i in Results">
+                            <td>
+                                {{i.Judul}}
+                            </td>
+                            <td>{{i.FileName}}</td>
+                            <td>{{i.ProsentaseJudul}}%</td>
+                            <td>{{i.ProsentaseAbstrak}}%</td>
+                            <td><button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" ng-click="View(i)"><span><i class="glyphicon glyphicon-eye-close"></i></span></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal-label">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content col-md-12">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModal-label">Modal title</h4>
+                        </div>
+                        <div class="modal-body col-md-6">
+                            <div ng-bind-html="NewAbstract"></div>
+                        </div>
+                        <div class="modal-body col-md-6">
+                            <div ng-bind-html="PageHtml"></div>
+                        </div>
+                     
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="AboutView.htm">
+        <div ng-init="Init()">
+            <center>
+                <h2>
+                    {{Judul}}
+                </h2>
+            </center>
+           
+        </div>
+    </script>
+
+
+
+</div>

@@ -1,0 +1,29 @@
+﻿@model AdrianaApp.Models.IndexViewModel
+@{
+    ViewBag.Title = "Manage";
+    Layout = "~/Views/Shared/_Login.cshtml";
+}
+
+<h2>@ViewBag.Title.</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+    <h4>Mengubah Password</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Password:</dt>
+        <dd>
+            [
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Change your password", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Create", "SetPassword")
+            }
+            ]
+        </dd>
+       
+    </dl>
+</div>
