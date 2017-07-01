@@ -1,8 +1,10 @@
-using System; 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;using DAL;
+using System.Threading.Tasks;
+using AdrianaApp.Models.Views;
+using DAL;
 namespace AdrianaApp.Models.Data
 {
     [TableName("abstrak")]
@@ -43,7 +45,7 @@ namespace AdrianaApp.Models.Data
         }
 
         [DbColumn("Pembimbing1")]
-        public string Pembimbing1
+        public int Pembimbing1
         {
             get { return _pembimbing1; }
             set
@@ -54,7 +56,7 @@ namespace AdrianaApp.Models.Data
         }
 
         [DbColumn("Pembimbing2")]
-        public string Pembimbing2
+        public int Pembimbing2
         {
             get { return _pembimbing2; }
             set
@@ -108,18 +110,45 @@ namespace AdrianaApp.Models.Data
             }
         }
 
-        public double ProsentaseJudul { get; internal set; }
-        public double ProsentaseAbstrak { get; internal set; }
+        public double ProsentaseJudul
+        {
+            get
+            {
+                return Helper.RoundUp(_ProsentaseJudul, 2);
+            }
+            set
+            {
+                _ProsentaseJudul = value;
+            }
+        }
+        public double ProsentaseAbstrak
+        {
+            get
+            {
+                return Helper.RoundUp(_ProsentaseAbstrak, 2);
+            }
+            set
+            {
+                _ProsentaseAbstrak = value;
+            }
+        }
+
+       
+
         public byte[] data { get; internal set; }
+        public mahasiswa Mahasiswa { get; internal set; }
+        public AbstractModel ProccessResult { get; internal set; }
 
         private int _id;
         private int _idmahasiswa;
         private string _judul;
-        private string _pembimbing1;
-        private string _pembimbing2;
+        private int _pembimbing1;
+        private int _pembimbing2;
         private string _abstraksi;
         private string _filename;
         private string _filetipe;
         private string _fileextention;
+        private double _ProsentaseJudul;
+        private double _ProsentaseAbstrak;
     }
 }

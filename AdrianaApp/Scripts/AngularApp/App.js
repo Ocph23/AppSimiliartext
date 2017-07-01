@@ -1,5 +1,4 @@
-﻿angular.module("App", ['ngRoute','ngProgress', 'App.Admin','App.User'])
-
+﻿angular.module("App", ['ngRoute', 'ngProgress', 'App.Admin', 'App.User'])
     .config(function ($routeProvider) {
         $routeProvider
         .when('/Index', {
@@ -23,7 +22,7 @@
 
         //User
 
-         .when("/UserIndex", {
+         .when("/userindex", {
              templateUrl: "UserIndexView.htm",
              controller: "UserIndexController"
          })
@@ -38,7 +37,20 @@
          .when("/About", {
              templateUrl: "AboutView.htm",
              controller: "AboutController"
-         })
+            })
+
+            .when("/Help", {
+                templateUrl: "HelpView.htm",
+
+            })
+            .when("/Dosen", {
+                templateUrl: "DosenView.htm",
+                controller: "DosenController"
+            })
+            .when("/ReportAnalisa", {
+                templateUrl: "ReportAnalisaView.htm",
+                controller: "ReportAnalisaController"
+            })
 
            .when("/", {
                templateUrl: "UserIndexView.htm",
@@ -51,4 +63,7 @@
 
 
 
-    });
+    })
+
+
+;

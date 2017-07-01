@@ -1,60 +1,104 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title Similiar Text</title>
+    <meta name="description" content="">
+    <meta name="author" content="Ocph23">
+    <!-- Favicons-->
+    <link rel="apple-touch-icon-precomposed" href="~/Images/apple-touch-icon-152x152.png">
+    <meta name="msapplication-TileColor" content="#FFFFFF">
+    <meta name="msapplication-TileImage" content="~/Images/mstile-144x144.png">
+    <link rel="icon" href="~/Images/favicon-32x32.png" sizes="32x32">
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/angular")
-
-  
-    
-    <meta name="description" content="The description of my page" />
+    <meta name="description" content="App Semiliar Text" />
 </head>
-<body class="container" ng-app="App" >
-    <div class="row">
-        <div class="row">
-                <h2>
-                    ApKeDoks
-                </h2>
-                <p>
-                    Simillar Search Text Document
-                </p>
-                <p>
-                    <a class="btn" href="#"></a>
-                </p>
-                <nav class="navbar navbar-default" role="navigation">
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav">
-                            <li>
-                                <a href="#UserIndex">Home</a>
-                            </li>
-                           
-                            <li>
-                                <a href="#Deteksi">Deteksi Plagiat</a>
-                            </li>
-                            <li>
-                                <a href="#About">About</a>
-                            </li>
-                        </ul>
-                        @Html.Partial("_LoginPartial")
-                    </div>
-                </nav>
-                <div class="container body-content">
-                    @RenderBody()
-                    <hr />
-                    <footer>
-                        <p>&copy; @DateTime.Now.Year - USTJ</p>
-                    </footer>
-                </div>
 
-                @Scripts.Render("~/bundles/jquery")
-                @Scripts.Render("~/bundles/bootstrap")
-                @RenderSection("scripts", required: false)
-        
-            </div>
+
+
+
+<body class="container"  ng-app="App">
+    <!-- Static navbar -->
+    <div class="navbar navbar-default" style="margin-bottom:0" role="navigation">
+        <div style="height:400px; background-image: url('../../Images/rak.jpg');">
+        </div>
+        <div class="navbar-header containerOrange">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/#userindex">ApKesDoks</a>
+        </div>
+        <div class="navbar-collapse collapse containerOrange">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="#userindex">Home</a>
+                </li>
+                <li>
+                    <a href="#Deteksi">Deteksi Kemiripan</a>
+                </li>
+                <li>
+                    <a href="#Help">Help</a>
+                </li>
+                <li>
+                    <a href="#About">About</a>
+                </li>
+               
+
+            </ul>
+            <ul  class="nav pull-right">
+                <li>
+                    @Html.Partial("_LoginPartial")
+                </li>
+            </ul>
+         
+        </div>
+        <!--/.nav-collapse -->
     </div>
+    <!-- Main component for a primary marketing message or call to action -->
+    <div style="padding:20px; background-color:#F2D5D5; min-height:400px">
+        @RenderBody()
+    </div>
+  
+
+    <footer class="containerFooter">
+        <div class="container">
+            <div class="row" style="margin:10px">
+                <div class="col-lg-4  col-md-4 col-sm-4">
+                    <div class="footer-copyright footer_dv">
+                        <div class="container">
+
+                            <h4>&copy; @DateTime.Now.Year -Andriani</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2  col-md-2 col-sm-2">
+                   
+                </div>
+                <div class="col-lg-6  col-md-6 col-sm-6">
+                    <div class="footer_dv">
+                        <div>
+                            <h4>
+                                Universitas Sains dan Teknologi Jayapura
+                            </h4>
+                            <div> Address: Jl. Raya Sentani - Padang Bulan</div>
+                            <div> Kota Jayapura, Papua 99224</div>
+                            <i class="glyphicon glyphicon-phone-alt"></i> Phone: (0967) 581659
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
 
 </body>
 </html>

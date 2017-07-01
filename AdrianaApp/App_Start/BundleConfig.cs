@@ -19,8 +19,9 @@ namespace AdrianaApp
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                         "~/Scripts/modernizr-*"));
 
+            //   "~/Scripts/materialize.js",
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.js",
+                "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
 
@@ -31,9 +32,10 @@ namespace AdrianaApp
                          "~/Scripts/AngularApp/AdminController.js",
                              "~/Scripts/AngularApp/UserController.js", "~/Scripts/AngularApp/app.js"));
 
-
+            // ,
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                      "~/Content/bootstrap.css",
+                "~/fonts/font-awesome-4.7.0/css/font-awesome.min.css",
+                    "~/Content/bootstrap.css","~/Content/bootstrap-theme.css",
                       "~/Content/site.css"));
         }
     }

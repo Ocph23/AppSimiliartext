@@ -19,17 +19,65 @@ namespace AdrianaApp.Models.Views
         public List<MyData> SourceAbstrak = new List<MyData>();
         public List<MyData> KGramAbstrak = new List<MyData>();
 
+
+        //CloneOf Judul
+        public string JudulAsli { get; set; }
+        public string JudulAfterCaseFolding { get; private set; }
+        public List<MyData> SourceJudulAfterTokenizing { get; private set; }
+        public List<MyData> SourceJudulAfterStemming { get; private set; }
+        public List<MyData> SourceJudulAfterKgram { get; private set; }
+
+
+
+        public string AbstractAsli { get; set; }
+        public string AbstractAfterCaseFolding { get; private set; }
+        public List<MyData> SourceAbstractAfterTokenizing { get; private set; }
+        public List<MyData> SourceAbstractAfterStemming { get; private set; }
+        public List<MyData> SourceAbstractAfterKGram { get; private set; }
+
+
+
         public AbstractModel( int Id, string Judul, string AbstractText, AbstractSetting setting)
         {
             this.Id = Id;
             this.setting = setting;
             this.Judul = Judul;
             this.AbstrakText = AbstractText;
+            this.JudulAsli = Judul.Clone().ToString();
+            this.AbstractAsli = AbstractText.Clone().ToString();
+            this.ProccessJudul();
+            this.ProccessAbstract();
         }
 
+        private void ProccessAbstract()
+        {
+            CaseFolding(ref abstrak);
+            this.AbstractAfterCaseFolding = abstrak.Clone().ToString();
+            this.SourceAbstractAfterCaseFolding = new List<MyData>();
+            Tokenizing(ref abstrak, ref SourceAbstractAfterCaseFolding);
+            Filtering(ref abstrak);
+            Tokenizing(ref abstrak, ref SourceAbstrak);
+            this.SourceAbstractAfterTokenizing = new List<MyData>(SourceAbstrak);
+            Stemming(ref abstrak, ref SourceAbstrak);
+            this.SourceAbstractAfterStemming = new List<MyData>(SourceAbstrak);
+            KGramProcces(abstrak, ref KGramAbstrak);
+        }
 
+        private void ProccessJudul()
+        {
+            CaseFolding(ref judul);
+            this.JudulAfterCaseFolding = judul.Clone().ToString();
+            this.SourceJudulAfterCaseFolding = new List<MyData>();
+            Tokenizing(ref judul, ref SourceJudulAfterCaseFolding);
+            Filtering(ref judul);
+            Tokenizing(ref judul, ref SourceJudul);
+            this.SourceJudulAfterTokenizing = new List<MyData>(SourceJudul);
+            Stemming(ref judul, ref SourceJudul);
+            this.SourceJudulAfterStemming = new List<MyData>(SourceJudul);
+            KGramProcces(judul, ref KGramJudul);
+        }
 
-       private string judul;
+        private string judul;
 
         public string Judul
         {
@@ -40,11 +88,7 @@ namespace AdrianaApp.Models.Views
             set
             {
                 judul = value;
-                CaseFolding(ref judul);
-                Filtering(ref judul);
-                Tokenizing(ref judul, ref SourceJudul);
-                Stemming(ref judul,ref SourceJudul);
-                KGramProcces(judul, ref KGramJudul);
+               
                 OnPropertyChange("Judul");
 
             }
@@ -52,6 +96,8 @@ namespace AdrianaApp.Models.Views
 
 
         private string abstrak;
+        public List<MyData> SourceAbstractAfterCaseFolding;
+        public List<MyData> SourceJudulAfterCaseFolding;
 
         public string AbstrakText
         {
@@ -63,19 +109,16 @@ namespace AdrianaApp.Models.Views
             set
             {
                 abstrak = value;
-                CaseFolding(ref abstrak);
-                Filtering(ref abstrak);
-                Tokenizing(ref abstrak, ref SourceAbstrak);
-                Stemming(ref abstrak, ref SourceAbstrak);
-                KGramProcces(abstrak,ref KGramAbstrak);
+               
                 OnPropertyChange("AbstrakText");
 
             }
         }
 
         public int Id { get; private set; }
-        public double ProsentaseJudul { get; internal set; }
-        public double ProsentaseAbstrak { get; internal set; }
+       
+       
+
 
         //proccess
         private void KGramProcces(string text,ref List<MyData> list)
@@ -86,7 +129,7 @@ namespace AdrianaApp.Models.Views
             for (int i = 0; i < s.Count; i++)
             {
                 if (!string.IsNullOrEmpty(s[i].ToString()))
-                    list.Add(new MyData { data = s[i].ToString(), HasCode = this.GetHashCode( s[i].ToString())});
+                    list.Add(new MyData { data = s[i].ToString(), Prime=setting.Primes, HasCode = this.GetHashCode( s[i].ToString())});
             }
         }
         public string KGram(string text, int Lenght)
@@ -116,7 +159,7 @@ namespace AdrianaApp.Models.Views
             for (int i = 0; i < s.Count; i++)
             {
                 if (!string.IsNullOrEmpty(s[i].ToString()))
-                   list.Add(new MyData { data = s[i].ToString() });
+                   list.Add(new MyData { Prime=setting.Primes, data = s[i].ToString() });
             }
         }
 
@@ -146,20 +189,22 @@ namespace AdrianaApp.Models.Views
             {
                 text = new string(text.Where(O => !Char.IsPunctuation(O)).ToArray());
             }
+           // text = new string(text.Where(O => Char.IsLetter(O) || Char.IsWhiteSpace(O)).ToArray());
+
 
         }
 
         //end proccess
-        private int GetHashCode(string v)
+        private long GetHashCode(string v)
         {
             var ascci = Encoding.ASCII.GetBytes(v);
             var angkat = ascci.Length - 1;
             int prima =setting.Primes;
-            int hasil = 0;
+            long hasil = 0;
             foreach (var item in ascci)
             {
                 var value = Convert.ToInt32(item);
-                var va = value * (Math.Pow(prima, angkat));
+                var va = value * (Math.Pow(10, angkat));
                 hasil += Convert.ToInt32(va);
                 angkat -= 1;
             }
@@ -217,7 +262,7 @@ namespace AdrianaApp.Models.Views
             get
             {
                 if (_primes <= 0)
-                    return 7;
+                    return 101;
                 return _primes;
             }
             set
@@ -233,7 +278,21 @@ namespace AdrianaApp.Models.Views
     public class MyData
     {
         public string data { get; set; }
-        public int HasCode { get; internal set; }
+        public long HasCode { get;  set; }
         public string RootWord { get; set; }
+        public int Prime { get; set; }
+
+        public long ModuloValue
+        {
+            get
+            {
+                if (HasCode > 0)
+                    return HasCode % this.Prime;
+                else
+                    return 0;
+            }
+
+        }
+
     }
 }

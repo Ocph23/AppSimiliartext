@@ -31,6 +31,7 @@ namespace AdrianaApp
         internal IRepository<mahasiswa> Mahasiswa{ get { return new Repository<mahasiswa>(this); } }
         internal IRepository<kemiripan> Kemiripan{ get { return new Repository<kemiripan>(this); } }
         internal IRepository<RootWord> RoadWords { get { return new Repository<RootWord>(this); } }
+        internal IRepository<dosen> Dosens { get { return new Repository<dosen>(this); } }
 
         public IDbConnection Connection
         {

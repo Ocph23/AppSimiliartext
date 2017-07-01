@@ -17,6 +17,7 @@ using OpenXmlPowerTools;
 using System.Xml.Linq;
 using AdrianaApp.Models.Data;
 using DocumentFormat.OpenXml.Drawing;
+using AdrianaApp.Models.Views;
 
 namespace AdrianaApp.api
 {
@@ -37,19 +38,18 @@ namespace AdrianaApp.api
                 var trans = db.Connection.BeginTransaction();
                 try
                 {
-                    var provider = new MyStreamProvider(uploadPath);
+                    var provider = new MultipartFormDataStreamProvider(uploadPath);
                     await Request.Content.ReadAsMultipartAsync(provider);
                     var a = new Models.Data.abstrak();
                     var mah = new Models.Data.mahasiswa();
                     FileInfo fi = null;
+
                     foreach (var file in provider.FileData)
                     {
-                        var f = file.Headers.ContentDisposition.FileName;
-                        a.FileName = f.Substring(1, f.Length - 2);
-
-                        a.FileTipe = file.Headers.ContentType.MediaType;
-                        a.FileExtention = a.FileName.Split('.')[1];
                         fi = new FileInfo(file.LocalFileName);
+                        a.FileName = fi.Name;
+                        a.FileTipe = file.Headers.ContentType.MediaType;
+                       
                     }
 
                     foreach (HttpContent ctnt in provider.Contents)
@@ -66,11 +66,11 @@ namespace AdrianaApp.api
                         }
                         else if (field == "Pembimbing1")
                         {
-                            a.Pembimbing1 = await ctnt.ReadAsStringAsync();
+                            a.Pembimbing1 = Convert.ToInt32(await ctnt.ReadAsStringAsync());
                         }
                         else if (field == "Pembimbing2")
                         {
-                            a.Pembimbing2 = await ctnt.ReadAsStringAsync();
+                            a.Pembimbing2 = Convert.ToInt32(await ctnt.ReadAsStringAsync());
                         }
                         else if (field == "NPM")
                         {
@@ -90,20 +90,51 @@ namespace AdrianaApp.api
                         }
                     }
 
+
                     StringBuilder sb = new StringBuilder();
-                    using (WordprocessingDocument pac = WordprocessingDocument.Open(uploadPath + "\\" + a.FileName, true))
+
+                    if (a.FileTipe == "application/pdf")
                     {
-                        string txt = string.Empty;
-                        OpenXmlElement element = pac.MainDocumentPart.Document.Body;
-                        if (element != null)
+                        a.FileExtention = "pdf";
+                        string txt = Helper.ExtractTextFromPdf(uploadPath + "\\" + a.FileName);
+                        sb.Append(txt);
+                    }
+                    else if (a.FileTipe == "text/plain")
+                    {
+                        a.FileExtention = "txt";
+                        string txt = Helper.ExtractPlainText(uploadPath + "\\" + a.FileName);
+                        sb.Append(txt);
+                    }
+                    else if (a.FileTipe == "application/doc")
+                    {
+                        a.FileExtention = "doc";
+                        string txt = Helper.ExtractPlainText(uploadPath + "\\" + a.FileName);
+                        sb.Append(txt);
+                    }
+                    else if (a.FileTipe == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    {
+                        a.FileExtention = "docx";
+                        using (WordprocessingDocument pac = WordprocessingDocument.Open(uploadPath + "\\" + a.FileName, true))
                         {
-                            sb.Append(Helper.GetPlainText(element));
+                            string txt = string.Empty;
+                            OpenXmlElement element = pac.MainDocumentPart.Document.Body;
+                            if (element != null)
+                            {
+                                sb.Append(Helper.GetPlainText(element));
+                            }
                         }
                     }
+                    else
+                    {
+                        throw new SystemException("Format File Tidak Didukung");
+                    }
+
+                    //string txt=Helper.GetPlainTextAll(uploadPath + "\\" + a.FileName);
+
                     a.Abstraksi = sb.ToString();
 
-                   var id= db.Mahasiswa.InsertAndGetLastID(mah);
-                   
+                    var id = db.Mahasiswa.InsertAndGetLastID(mah);
+
                     if (id > 0)
                     {
                         a.IdMahasiswa = id;
@@ -113,8 +144,7 @@ namespace AdrianaApp.api
                     }
                     else
                     {
-
-                        return Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, "Data tidak dapat ditambahkan");
+                        throw new SystemException("Data tidak dapat ditambahkan");
                     }
 
                 }
@@ -124,9 +154,6 @@ namespace AdrianaApp.api
                     return Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, ex.Message);
                 }
             }
-
-
-
         }
 
 
@@ -134,78 +161,89 @@ namespace AdrianaApp.api
         [HttpPost]
         public async Task<HttpResponseMessage> Proccess()
         {
-            string uploadPath = HttpContext.Current.Server.MapPath("~/uploads");
 
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotAcceptable,
-                "This request is not properly formatted"));
-
-            var provider = new MultipartMemoryStreamProvider();
-            await Request.Content.ReadAsMultipartAsync(provider);
-
-            var a = new Models.Data.abstrak();
-            var setting = new Models.Views.AbstractSetting();
-
-            foreach (HttpContent ctnt in provider.Contents)
+            try
             {
-                var name = ctnt.Headers.ContentDisposition.Name;
-                var field = name.Substring(1, name.Length - 2);
-              
-                if (field == "file")
-                {
-                    var f = ctnt.Headers.ContentDisposition.FileName;
-                    a.FileName= f.Substring(1, f.Length - 2);
+                string uploadPath = HttpContext.Current.Server.MapPath("~/uploads");
 
-                 //   a.FileTipe = file.Headers.ContentType.MediaType;
+                if (!Request.Content.IsMimeMultipartContent())
+                    throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotAcceptable,
+                    "This request is not properly formatted"));
+
+                var provider = new MyStreamProvider(uploadPath);
+                await Request.Content.ReadAsMultipartAsync(provider);
+                var a = new Models.Data.abstrak();
+                var mah = new Models.Data.mahasiswa();
+                FileInfo fi = null;
+                foreach (var file in provider.FileData)
+                {
+                    var f = file.Headers.ContentDisposition.FileName;
+                    a.FileName = f.Substring(1, f.Length - 2);
+                    a.FileTipe = file.Headers.ContentType.MediaType;
                     a.FileExtention = a.FileName.Split('.')[1];
-                    //now read individual part into STREAM
-                    var stream = await ctnt.ReadAsStreamAsync();
-
-                    byte[] data = new byte[stream.Length];
-
-
-                    if (stream.Length != 0)
+                    fi = new FileInfo(file.LocalFileName);
+                    var s = fi.OpenRead();
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        await stream.ReadAsync(data, 0, (int)stream.Length);
-                        a.data = data;
+                        s.CopyTo(ms);
+                        a.data = ms.ToArray();
                     }
+                    s.Close();
                 }
-              else if (field == "Judul")
+                var setting = new Models.Views.AbstractSetting();
+
+                foreach (HttpContent ctnt in provider.Contents)
                 {
-                    a.Judul = await ctnt.ReadAsStringAsync();
+                    var name = ctnt.Headers.ContentDisposition.Name;
+                    var field = name.Substring(1, name.Length - 2);
+
+                    if (field == "Judul")
+                    {
+                        a.Judul = await ctnt.ReadAsStringAsync();
+                    }
+                    else if (field == "TandaBaca")
+                    {
+                        var x = await ctnt.ReadAsStringAsync();
+                        setting.TandaBaca = Convert.ToBoolean(x);
+                    }
+                    else if (field == "Angka")
+                    {
+                        var x = await ctnt.ReadAsStringAsync();
+                        setting.Angka = Convert.ToBoolean(x);
+                    }
+                    else if (field == "HurufBesar")
+                    {
+                        var x = await ctnt.ReadAsStringAsync();
+                        setting.HurufBesar = Convert.ToBoolean(x);
+                    }
+
                 }
-                else if (field == "TandaBaca")
+
+
+                StringBuilder sb = new StringBuilder();
+                StringBuilder sb1 = new StringBuilder();
+
+                //
+                if (a.FileTipe == "application/pdf")
                 {
-                    var x= await ctnt.ReadAsStringAsync();
-                    setting.TandaBaca = Convert.ToBoolean(x);
+                    string txt = Helper.ExtractTextFromPdf(uploadPath + "\\" + a.FileName);
+                    sb1.Append(Convert.ToBase64String(Helper.GetPdfText(uploadPath + "\\" + a.FileName)));
+                    sb.Append(txt);
                 }
-                else if (field == "Angka")
+                else if (a.FileTipe == "text/plain")
                 {
-                    var x = await ctnt.ReadAsStringAsync();
-                    setting.Angka = Convert.ToBoolean(x);
+                    string txt = Helper.ExtractPlainText(uploadPath + "\\" + a.FileName);
+                    sb.Append(txt);
+                    sb1.Append(HttpContext.Current.Server.HtmlEncode(txt));
                 }
-                else if (field == "HurufBesar")
+                else if (a.FileTipe == "application/doc")
                 {
-                    var x = await ctnt.ReadAsStringAsync();
-                    setting.HurufBesar = Convert.ToBoolean(x);
+                    string txt = Helper.ExtractPlainText(uploadPath + "\\" + a.FileName);
+                    sb.Append(txt);
                 }
-
-            }
-
-
-            StringBuilder sb = new StringBuilder();
-            StringBuilder sb1 = new StringBuilder();
-
-
-
-
-            using (var db = new OcphDbContext())
-            {
-                try
-                {   // Open the text file using a stream reader.
-
-                    var stream = new MemoryStream(a.data);
-                    using (WordprocessingDocument pac = WordprocessingDocument.Open(stream, true))
+                else if (a.FileTipe == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                {
+                    using (WordprocessingDocument pac = WordprocessingDocument.Open(uploadPath + "\\" + a.FileName, true))
                     {
                         string txt = string.Empty;
                         OpenXmlElement element = pac.MainDocumentPart.Document.Body;
@@ -213,34 +251,24 @@ namespace AdrianaApp.api
                         {
                             sb.Append(Helper.GetPlainText(element));
                         }
-                    
-
-
-                    a.Abstraksi = sb.ToString();
-                    
-                    Plagiat plagiat = new Plagiat(a,setting);
-                  
                         var pars = element.Elements<Paragraph>();
                         DocumentFormat.OpenXml.Wordprocessing.Color color = new DocumentFormat.OpenXml.Wordprocessing.Color();
                         DocumentFormat.OpenXml.Wordprocessing.Highlight hil = new DocumentFormat.OpenXml.Wordprocessing.Highlight();
                         foreach (var para in pars)
                         {
-                            foreach(var run in para.Elements<Run>())
+                            foreach (var run in para.Elements<Run>())
                             {
-                                foreach(var text in run.Elements<Text>())
+                                foreach (var text in run.Elements<Text>())
                                 {
-                                    if(text.Text.Contains("eluan"))
+                                    if (text.Text.Contains("eluan"))
                                     {
                                         color.Val = "365F91";
                                         run.Append(color);
                                         pac.MainDocumentPart.Document.Save();
-
                                     }
                                 }
                             }
                         }
-                       
-
                         HtmlConverterSettings settings = Helper.GetHtmlConverterSettings(a.FileName);
                         XElement html = HtmlConverter.ConvertToHtml(pac, settings);
 
@@ -253,35 +281,45 @@ namespace AdrianaApp.api
                         // must do it correctly, or entities will not be serialized properly.
 
                         sb1.Append(html.ToString(SaveOptions.DisableFormatting));
-                        AbstractResultView res = new AbstractResultView();
-                        res.Data = plagiat.Result.Where(O => O.ProsentaseAbstrak > 50 || O.ProsentaseJudul > 50);
-                        res.StrHTML = sb1.ToString();
 
-                        return Request.CreateResponse(HttpStatusCode.OK, res);
+                        //
                     }
-
-                 
                 }
-                catch (Exception e)
+                else
                 {
+                    throw new SystemException("Format File Tidak Didukung");
+                }
+                //
 
-                    return Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, "Data tidak dapat ditambahkan");
+                using (var db = new OcphDbContext())
+                {
+                    a.Abstraksi = sb.ToString();
+                    Plagiat plagiat = new Plagiat(a, setting);
+
+                    AbstractResultView res = new AbstractResultView();
+                    var datas = plagiat.Result;
+
+                    foreach(var item in datas)
+                    {
+                        item.Mahasiswa = db.Mahasiswa.Where(O => O.Id == item.IdMahasiswa).FirstOrDefault();
+                    }
+                    res.Data = datas.OrderByDescending(O=>O.ProsentaseAbstrak).ToList();
+                    res.StrHTML = sb1.ToString();
+                    return Request.CreateResponse(HttpStatusCode.OK, res);
                 }
             }
-
-
-
-
-
-
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, ex.Message);
+            }
         }
-     
     }
 
     public class AbstractResultView
     {
-        public IEnumerable<abstrak> Data { get; internal set; }
+        public List<abstrak> Data { get; internal set; }
         public string StrHTML { get; internal set; }
+        public List<AbstractModel> ProsesResult { get; set; }
     }
 
 

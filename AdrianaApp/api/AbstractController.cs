@@ -18,8 +18,9 @@ namespace AdrianaApp.api
             using (var db = new OcphDbContext())
             {
                 var result = from a in db.Abstraks.Select()
-                             join b in db.Mahasiswa.Select()
-                             on a.IdMahasiswa equals b.Id
+                             join b in db.Mahasiswa.Select() on a.IdMahasiswa equals b.Id
+                             join p1 in db.Dosens.Select() on a.Pembimbing1 equals p1.Id
+                             join p2 in db.Dosens.Select() on a.Pembimbing2 equals p2.Id
                              select new Models.Views.AbstractView
                              {
                                  Abstraksi = a.Abstraksi,
@@ -32,7 +33,7 @@ namespace AdrianaApp.api
                                  IdMahasiswa = a.IdMahasiswa,
                                  Judul = a.Judul,
                                  Alamat=b.Alamat, Jurusan=b.Jurusan, MahasiswaId=b.Id
-                                , Nama=b.Nama, NPM=b.NPM,  
+                                , Nama=b.Nama, NPM=b.NPM,  PembimbingI=p1, PembimbingII=p2 
                              };
                 return result.ToList();
             }

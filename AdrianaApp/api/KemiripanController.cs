@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -19,7 +20,7 @@ namespace AdrianaApp.api
     public class KemiripanController : ApiController
     {
         // GET: api/Kemiripan
-        [HttpGet]
+       [HttpGet]
         public async Task<HttpResponseMessage> View(int Id)
         {
             try
@@ -28,13 +29,24 @@ namespace AdrianaApp.api
                 using (var db = new OcphDbContext())
                 {
                     var result = db.Abstraks.Where(O => O.Id == Id).FirstOrDefault();
-                    string uploadPath = HttpContext.Current.Server.MapPath("~/uploads");
 
-                    sb = Helper.GetHtml(uploadPath,result.FileName);
+                    var path = HttpContext.Current.Server.MapPath("~/uploads/")+result.FileName;
 
-
+                    if (result.FileTipe=="application/pdf")
+                    {
+                      sb.Append(Convert.ToBase64String(Helper.GetPdfText(path)));
+                    }else if(result.FileTipe=="text/plain")
+                    {
+                        string txt = HttpContext.Current.Server.HtmlEncode(Helper.ExtractPlainText(path));
+                        sb.Append(txt);
+                    } else
+                    {
+                       
+                      sb.Append(Helper.GetHtml(path).ToString());
+                    }
+                    return Request.CreateResponse(HttpStatusCode.OK, sb.ToString());
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, sb.ToString());
+               
             }
             catch (Exception ex)
             {

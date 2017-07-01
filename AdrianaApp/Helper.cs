@@ -1,8 +1,14 @@
 ﻿using AdrianaApp.Models.Data;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 using OpenXmlPowerTools;
+using Spire.Pdf;
+using Spire.Pdf.Lists;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
@@ -58,10 +64,10 @@ namespace AdrianaApp
             return PlainTextInWord.ToString();
         }
 
-        internal static StringBuilder GetHtml(string uploadPath, string FileName)
+        internal static StringBuilder GetHtml(string FileName)
         {
             StringBuilder sb = new StringBuilder();
-            using (WordprocessingDocument pac = WordprocessingDocument.Open(uploadPath + "/" + FileName, true))
+            using (WordprocessingDocument pac = WordprocessingDocument.Open(FileName, true))
             {
                 HtmlConverterSettings settings = GetHtmlConverterSettings(FileName);
                 XElement html = HtmlConverter.ConvertToHtml(pac, settings);
@@ -149,5 +155,57 @@ namespace AdrianaApp
 
             return settings;
         }
+
+      
+
+        internal static byte[] GetPdfText(string file)
+        {
+            var s = new FileStream(file, FileMode.Open, FileAccess.Read);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                s.CopyTo(ms);
+                var fileData = ms.ToArray();
+                return fileData;
+            }
+        }
+
+        public static string ExtractTextFromPdf(string path)
+        {
+            using (PdfReader reader = new PdfReader(path))
+            {
+                StringBuilder text = new StringBuilder();
+
+                for (int i = 1; i <= reader.NumberOfPages; i++)
+                {
+                    text.Append(PdfTextExtractor.GetTextFromPage(reader, i));
+                }
+
+                return text.ToString();
+            }
+        }
+
+        internal static string ExtractPlainText(string file)
+        {
+            string text;
+            var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read);
+            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8))
+            {
+                text = streamReader.ReadToEnd();
+            }
+            return text;
+        }
+
+
+        public static double RoundUp(double input, int places)
+        {
+            double multiplier = Math.Pow(10, Convert.ToDouble(places));
+            return Math.Ceiling(input * multiplier) / multiplier;
+        }
+
     }
 }
+
+
+
+
