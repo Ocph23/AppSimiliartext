@@ -1,0 +1,13 @@
+BEGIN
+ UPDATE jadwalpasien b
+JOIN permintaanpindah  p
+ON p.Id = b.IdPindah
+SET b.IdPindah = 0, b.Status='Normal' ,b.IdJadwal=p.Dari
+WHERE b.idpasien = new.IdPasien;
+END;
+
+
+
+BEGIN
+ update jadwalpasien set idjadwal=new.Ke, Status='Pindah' , idPindah=new.Id where idpasien=new.idpasien;
+END;
